@@ -116,6 +116,7 @@ SCHEMER_VERSION = 'v1.4.0';
 
 % ------------------------ Input handling ---------------------------------
 % ------------------------ Default inputs ---------------------------------
+defaultPath = fullfile(fileparts(mfilename('fullpath')),'schemes');
 if nargin<2
     inc_bools = false; % Default off, so only override extra options if intended
 end
@@ -141,6 +142,14 @@ if nargin>=1 && ~ischar(fname) && ~isempty(fname)
         error('Invalid combination of inputs');
     end
 end
+if ~isempty(fname) && ~exist(fname,'file') 
+    if isdir(fname)
+        defaultPath = fname;
+        fname = [];
+    elseif exist(fullfile(defaultPath,[fname,'.prf']),'file')
+        fname = fullfile(defaultPath,[fname,'.prf']);
+    end
+end
 
 % ------------------------ Check for file ---------------------------------
 filefilt = ...
@@ -155,9 +164,9 @@ if ~isempty(fname)
 else
     % Dialog asking for input filename
     % Need to make this dialogue include .txt by default, at least
-    [filename, pathname] = uigetfile(filefilt);
+    [filename, pathname] = uigetfile(filefilt,'Choose scheme file',defaultPath);
     % End if user cancels
-    if isequal(filename, 0);
+    if isequal(filename, 0)
         if nargout>0; varargout{1} = 0; end;
         return;
     end
